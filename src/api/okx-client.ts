@@ -105,16 +105,21 @@ export class OKXClient {
 
   /**
    * Get account equity (total net worth including unrealized PnL)
+   * This includes both balance and positions
    */
   async getAccountEquity(): Promise<number> {
-    const balances = await this.getAccountBalance();
-    const usdtBalance = balances.find(b => b.currency === 'USDT');
+    const response = await this.client.get('/api/v5/account/balance');
     
-    if (!usdtBalance) {
-      throw new Error('USDT balance not found');
+    if (response.data.code !== '0') {
+      throw new Error(`OKX API Error: ${response.data.msg}`);
     }
 
-    return parseFloat(usdtBalance.totalEq);
+    const accountData = response.data.data[0];
+    if (!accountData || !accountData.totalEq) {
+      throw new Error('Account equity not found');
+    }
+
+    return parseFloat(accountData.totalEq);
   }
 
   /**

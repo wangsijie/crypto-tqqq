@@ -9,9 +9,13 @@ export interface OKXConfig {
 }
 
 export interface AccountBalance {
-  totalEq: string;
+  eq: string;
   availEq: string;
-  currency: string;
+  ccy: string;
+  upl: string;
+  isoEq: string;
+  cashBal: string;
+  frozenBal: string;
 }
 
 export interface TickerData {
