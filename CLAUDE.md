@@ -30,13 +30,6 @@ src/
 └── index.ts         # Main application entry point
 ```
 
-### Implementation Order
-Follow the roadmap in `ROADMAP.md` - prioritize high priority tasks first. Always:
-1. Update TODO list progress using TodoWrite tool
-2. Test each component before moving to next
-3. Add proper error handling and logging
-4. Validate with OKX API documentation
-
 ### Security Requirements
 - Never commit API keys or sensitive data
 - Use environment variables for credentials
@@ -63,7 +56,6 @@ Follow the roadmap in `ROADMAP.md` - prioritize high priority tasks first. Alway
 - `docker-compose down` - Stop container
 
 ## Important Notes
-- Always check current roadmap progress before implementing new features
 - Maintain transaction logs for audit purposes
 - Implement graceful shutdown handling
 - Consider market hours and maintenance windows
