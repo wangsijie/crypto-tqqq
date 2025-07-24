@@ -33,6 +33,7 @@ function shouldExecuteNow(targetHour: number, targetMinute: number): boolean {
   
   // Don't execute if we already ran today
   if (lastExecutionDate === todayKey) {
+    console.log(`🚫 Already executed today (${todayKey}), skipping...`);
     return false;
   }
   
@@ -41,6 +42,7 @@ function shouldExecuteNow(targetHour: number, targetMinute: number): boolean {
   
   // Check if current time matches or passed the target time
   if (currentHour > targetHour || (currentHour === targetHour && currentMinute >= targetMinute)) {
+    console.log(`✅ Execution time reached: ${currentHour}:${currentMinute.toString().padStart(2, '0')} >= ${targetHour}:${targetMinute.toString().padStart(2, '0')}`);
     return true;
   }
   
@@ -102,8 +104,27 @@ async function startScheduler(): Promise<void> {
   const { hour, minute } = parseSchedule(config.scheduler.cronSchedule);
   const nextExecution = getNextExecutionTime(hour, minute);
   
+  // If we're starting after today's execution time, mark today as already executed
+  const now = new Date();
+  const todayKey = now.toISOString().split('T')[0];
+  const currentHour = now.getUTCHours();
+  const currentMinute = now.getUTCMinutes();
+  
+  if (currentHour > hour || (currentHour === hour && currentMinute >= minute)) {
+    console.log(`⚠️ Current time (${currentHour}:${currentMinute.toString().padStart(2, '0')}) is past today's execution time (${hour}:${minute.toString().padStart(2, '0')})`);
+    console.log(`📅 Marking today (${todayKey}) as already executed to prevent immediate execution`);
+    lastExecutionDate = todayKey;
+  }
+  
   console.log(`📅 Daily execution time: ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} UTC`);
+  console.log(`🕐 Current time: ${new Date().toISOString()}`);
   console.log(`⏳ Next execution: ${nextExecution.toISOString()}`);
+  
+  const timeUntilNext = nextExecution.getTime() - new Date().getTime();
+  const hoursUntil = Math.floor(timeUntilNext / (1000 * 60 * 60));
+  const minutesUntil = Math.floor((timeUntilNext % (1000 * 60 * 60)) / (1000 * 60));
+  console.log(`⏰ Time remaining: ${hoursUntil}h ${minutesUntil}m`);
+  
   console.log(`🔄 Checking every ${CHECK_INTERVAL_MS / 1000} seconds`);
   console.log('─'.repeat(60));
 
@@ -116,6 +137,20 @@ async function startScheduler(): Promise<void> {
         // Calculate next execution time
         const nextExecution = getNextExecutionTime(hour, minute);
         console.log(`⏳ Next execution scheduled for: ${nextExecution.toISOString()}`);
+      } else {
+        // Show periodic status updates
+        const now = new Date();
+        const nextExecution = getNextExecutionTime(hour, minute);
+        const timeUntilNext = nextExecution.getTime() - now.getTime();
+        const hoursUntil = Math.floor(timeUntilNext / (1000 * 60 * 60));
+        const minutesUntil = Math.floor((timeUntilNext % (1000 * 60 * 60)) / (1000 * 60));
+        
+        // Log status every 15 minutes or show debug info if frequently executing
+        const currentMinute = now.getUTCMinutes();
+        if (currentMinute % 15 === 0 && now.getUTCSeconds() < 60) {
+          console.log(`⏰ Status: Waiting for execution time (${hoursUntil}h ${minutesUntil}m remaining) - Current: ${now.toISOString()}`);
+          console.log(`🔍 Debug: lastExecutionDate=${lastExecutionDate}, today=${now.toISOString().split('T')[0]}`);
+        }
       }
     } catch (error) {
       console.error('💥 Error in scheduler loop:', error);
