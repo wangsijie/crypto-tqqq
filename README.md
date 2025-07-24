@@ -31,7 +31,30 @@ An automated cryptocurrency perpetual contract rebalancing tool that maintains 3
 - Node.js 18+ or Docker
 - OKX exchange account with API credentials
 - Trading balance in USDT
+- **Manual setup of 3x perpetual position** (see Initial Setup below)
 - (Optional) Telegram bot for notifications
+
+### ⚠️ Important Initial Setup
+
+**Before running the bot, you must manually create a 3x perpetual position on OKX:**
+
+1. **Login to OKX** and navigate to the perpetual trading section
+2. **Select your trading pair** (e.g., ETH-USDT-SWAP, DOGE-USDT-SWAP)
+3. **Set leverage to 3x** in the trading interface
+4. **Open an initial position** with your desired size
+5. **Verify the position** is active and showing 3x leverage
+
+**Why this is required:**
+- The bot assumes an existing 3x perpetual position
+- It calculates adjustments based on your current position
+- Without an initial position, the bot cannot determine the target size
+- This ensures you have proper risk management and position sizing
+
+**Example Setup:**
+- Account Equity: $1,000 USDT
+- ETH Price: $2,000
+- Target Position: 1.5 ETH (3x leverage)
+- Manually open a 1.5 ETH long position at 3x leverage
 
 ## 📦 Installation
 
@@ -271,6 +294,12 @@ The bot adjusts positions when:
 
 ## 🛡️ Safety Features
 
+### Manual Position Setup Required
+- **Bot requires pre-existing 3x perpetual position** on OKX
+- You maintain full control over initial position size
+- Prevents accidental position creation or unwanted exposure
+- Ensures deliberate setup and risk assessment
+
 ### Dry-Run Mode (Default)
 - **Always enabled by default** for safety
 - Simulates all trades without execution
@@ -293,14 +322,22 @@ The bot adjusts positions when:
 
 ### Common Issues
 
-**1. API Authentication Errors**
+**1. No Position Found / Zero Current Position**
+```bash
+# Ensure you have manually created a 3x perpetual position on OKX
+# Verify the position is active and matches your TRADING_SYMBOL
+# Check that leverage is set to 3x in the OKX interface
+# Position must exist before running the bot
+```
+
+**2. API Authentication Errors**
 ```bash
 # Verify your OKX API credentials
 # Ensure API has trading permissions
 # Check IP whitelist settings on OKX
 ```
 
-**2. Telegram Not Working**
+**3. Telegram Not Working**
 ```bash
 # Verify bot token is correct
 # Check chat ID is accurate
@@ -308,7 +345,7 @@ The bot adjusts positions when:
 # Test with: TELEGRAM_ENABLED=true
 ```
 
-**3. Docker Issues**
+**4. Docker Issues**
 ```bash
 # Check logs
 docker-compose logs -f
@@ -320,7 +357,7 @@ docker-compose build --no-cache
 docker-compose exec crypto-rebalancer env | grep -E "(OKX|TELEGRAM)"
 ```
 
-**4. TypeScript Errors**
+**5. TypeScript Errors**
 ```bash
 # Type check
 npm run typecheck
