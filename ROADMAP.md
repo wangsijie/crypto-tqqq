@@ -8,19 +8,19 @@ Automated daily rebalancing tool for ETH perpetual contracts using OKX API to ma
 ## Implementation Tasks
 
 ### High Priority
-- [ ] Project setup: Initialize Node.js project with package.json and basic folder structure
-- [ ] Install and configure OKX API SDK or HTTP client for API interactions
-- [ ] Create configuration module for API credentials and trading parameters
-- [ ] Implement function to get account equity (total net worth including unrealized PnL)
-- [ ] Implement function to get current ETH/USDT perpetual contract price
-- [ ] Implement function to get current ETH perpetual position size
-- [ ] Implement market order execution function for position adjustments
+- [x] Project setup: Initialize Node.js project with package.json and basic folder structure
+- [x] Install and configure OKX API SDK or HTTP client for API interactions
+- [x] Create configuration module for API credentials and trading parameters
+- [x] Implement function to get account equity (total net worth including unrealized PnL)
+- [x] Implement function to get current ETH/USDT perpetual contract price
+- [x] Implement function to get current ETH perpetual position size
+- [x] Implement market order execution function for position adjustments
 - [ ] Implement main rebalancing logic that orchestrates all steps
 
 ### Medium Priority
-- [ ] Create position calculation logic: target = equity × 3 ÷ ETH_price
-- [ ] Create delta calculation and decision logic (minimum 0.01 ETH threshold)
-- [ ] Create transaction logging system (time, price, equity, position, adjustment)
+- [x] Create position calculation logic: target = equity × 3 ÷ ETH_price
+- [x] Create delta calculation and decision logic (minimum 0.01 ETH threshold)
+- [ ] Create transaction logging system (time, price, equity, position, adjustment) *(in progress)*
 - [ ] Add error handling and retry mechanisms for API failures
 - [ ] Create daily scheduler (cron job for UTC 00:05)
 

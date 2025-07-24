@@ -5,13 +5,16 @@
 
 import { OKXClient } from '../api';
 import { TradeLog, RebalanceResult } from '../types';
+import { LoggerService } from './logger';
 import config from '../config';
 
 export class StrategyService {
   private okxClient: OKXClient;
+  private logger: LoggerService;
 
-  constructor(okxClient: OKXClient) {
+  constructor(okxClient: OKXClient, logger?: LoggerService) {
     this.okxClient = okxClient;
+    this.logger = logger || new LoggerService();
   }
 
   /**
@@ -156,6 +159,9 @@ export class StrategyService {
         orderResult.error
       );
 
+      // Step 5: Log the trade
+      await this.logger.logTrade(tradeLog);
+
       return {
         success: orderResult.success,
         tradeLog,
@@ -169,6 +175,9 @@ export class StrategyService {
         0, 0, 0, 0, 0, 'hold',
         undefined, undefined, false, errorMessage
       );
+
+      // Log the error
+      await this.logger.logTrade(tradeLog);
 
       return {
         success: false,

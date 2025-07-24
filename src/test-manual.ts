@@ -4,7 +4,7 @@
  */
 
 import { OKXClient } from './api';
-import { StrategyService } from './services/strategy';
+import { StrategyService, LoggerService } from './services';
 import config from './config';
 
 async function testOKXConnection() {
@@ -111,7 +111,8 @@ async function testFullRebalancing() {
   
   try {
     const okxClient = new OKXClient(config.okx);
-    const strategy = new StrategyService(okxClient);
+    const logger = new LoggerService();
+    const strategy = new StrategyService(okxClient, logger);
     
     // Get current data
     const [equity, ethPrice, position] = await Promise.all([
@@ -142,6 +143,23 @@ async function testFullRebalancing() {
       console.log('  ⏸️ No action needed (within threshold)');
     }
     
+    // Log the dry run
+    const tradeLog = strategy.createTradeLog(
+      ethPrice,
+      equity,
+      position,
+      targetPosition,
+      delta,
+      action,
+      needsAdjustment ? Math.abs(delta) : undefined,
+      undefined,
+      true,
+      undefined
+    );
+    await logger.logTrade(tradeLog);
+    
+    console.log('\n📝 Trade logged to file system');
+    
   } catch (error) {
     console.error('❌ Error during rebalancing test:', error);
   }
@@ -167,6 +185,7 @@ async function main() {
       console.log('  npm run dev src/test-manual.ts connection  - Test API connection and basic data');
       console.log('  npm run dev src/test-manual.ts balance     - Test account balance details');
       console.log('  npm run dev src/test-manual.ts rebalance   - Test full rebalancing logic (dry run)');
+      console.log('  npm run dev src/test-logger.ts            - Test logger functionality');
   }
 }
 
