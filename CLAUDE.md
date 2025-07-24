@@ -52,9 +52,15 @@ Follow the roadmap in `ROADMAP.md` - prioritize high priority tasks first. Alway
 ### Commands to Run
 - `npm run dev` - Development mode
 - `npm run build` - Build TypeScript
-- `npm run start` - Production mode
+- `npm run start` - Single rebalancing execution
+- `npm run scheduler` - Continuous scheduler (Docker-friendly)
 - `npm run test` - Run tests
 - `npm run lint` - Lint code
+
+### Docker Deployment
+- `docker-compose up -d` - Start scheduled rebalancing
+- `docker-compose logs -f` - View logs
+- `docker-compose down` - Stop container
 
 ## Important Notes
 - Always check current roadmap progress before implementing new features

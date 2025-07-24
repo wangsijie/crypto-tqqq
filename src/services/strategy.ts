@@ -142,7 +142,19 @@ export class StrategyService {
       
       if (needsAdjustment && action !== 'hold') {
         const orderSize = Math.abs(delta);
-        orderResult = await this.executePositionAdjustment(action, orderSize);
+        
+        if (config.trading.dryRun) {
+          // Dry run mode - simulate successful execution
+          console.log(`🧪 DRY RUN: Would ${action.toUpperCase()} ${orderSize.toFixed(4)} ${config.trading.symbol}`);
+          orderResult = {
+            success: true,
+            orderId: `dry-run-${Date.now()}`,
+          };
+        } else {
+          // Live trading mode
+          console.log(`💰 LIVE: ${action.toUpperCase()} ${orderSize.toFixed(4)} ${config.trading.symbol}`);
+          orderResult = await this.executePositionAdjustment(action, orderSize);
+        }
       }
 
       // Step 4: Create trade log

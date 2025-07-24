@@ -1,0 +1,12 @@
+node_modules
+src
+.git
+.env*
+.DS_Store
+*.log
+logs
+README.md
+.eslintrc*
+jest.config*
+tsconfig.json
+*.md

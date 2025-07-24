@@ -14,6 +14,7 @@ export interface AppConfig {
     leverageMultiplier: number;
     minAdjustmentSize: number;
     instrument: string;
+    dryRun: boolean;
   };
   scheduler: {
     cronSchedule: string;
@@ -44,6 +45,7 @@ export const config: AppConfig = {
     leverageMultiplier: Number(process.env.LEVERAGE_MULTIPLIER) || 3,
     minAdjustmentSize: Number(process.env.MIN_ADJUSTMENT_SIZE) || 0.01,
     instrument: `${tradingSymbol}-USDT-SWAP`,
+    dryRun: process.env.DRY_RUN !== 'false', // Default to true for safety
   },
   scheduler: {
     cronSchedule: process.env.CRON_SCHEDULE || '5 0 * * *', // Daily at UTC 00:05
