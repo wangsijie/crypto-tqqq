@@ -14,7 +14,7 @@ async function testLogger() {
   console.log('Test 1: Logging successful BUY trade...');
   const buyLog: TradeLog = {
     timestamp: new Date().toISOString(),
-    ethPrice: 2100.50,
+    assetPrice: 2100.50,
     accountEquity: 12000,
     currentPosition: 15,
     targetPosition: 17.14,
@@ -30,7 +30,7 @@ async function testLogger() {
   console.log('\nTest 2: Logging successful SELL trade...');
   const sellLog: TradeLog = {
     timestamp: new Date().toISOString(),
-    ethPrice: 2200.00,
+    assetPrice: 2200.00,
     accountEquity: 12500,
     currentPosition: 17.14,
     targetPosition: 17.05,
@@ -44,7 +44,7 @@ async function testLogger() {
   console.log('\nTest 3: Logging failed trade...');
   const failedLog: TradeLog = {
     timestamp: new Date().toISOString(),
-    ethPrice: 2150.00,
+    assetPrice: 2150.00,
     accountEquity: 12300,
     currentPosition: 17.14,
     targetPosition: 17.16,

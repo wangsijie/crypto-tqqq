@@ -5,6 +5,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { TradeLog } from '../types';
+import config from '../config';
 
 export class LoggerService {
   private logDir: string;
@@ -81,15 +82,16 @@ export class LoggerService {
    */
   private printLog(log: TradeLog): void {
     const emoji = log.success ? '✅' : '❌';
-    const action = log.action === 'hold' ? 'HOLD' : `${log.action.toUpperCase()} ${log.orderSize?.toFixed(4) || 0} ETH`;
+    const symbol = config.trading.symbol;
+    const action = log.action === 'hold' ? 'HOLD' : `${log.action.toUpperCase()} ${log.orderSize?.toFixed(4) || 0} ${symbol}`;
     
     console.log(`\n${emoji} Trade Log - ${log.timestamp}`);
     console.log('─'.repeat(50));
-    console.log(`  ETH Price: $${log.ethPrice.toFixed(2)}`);
+    console.log(`  ${symbol} Price: $${log.assetPrice.toFixed(2)}`);
     console.log(`  Account Equity: $${log.accountEquity.toFixed(2)}`);
-    console.log(`  Current Position: ${log.currentPosition.toFixed(4)} ETH`);
-    console.log(`  Target Position: ${log.targetPosition.toFixed(4)} ETH`);
-    console.log(`  Delta: ${log.delta >= 0 ? '+' : ''}${log.delta.toFixed(4)} ETH`);
+    console.log(`  Current Position: ${log.currentPosition.toFixed(4)} ${symbol}`);
+    console.log(`  Target Position: ${log.targetPosition.toFixed(4)} ${symbol}`);
+    console.log(`  Delta: ${log.delta >= 0 ? '+' : ''}${log.delta.toFixed(4)} ${symbol}`);
     console.log(`  Action: ${action}`);
     
     if (log.orderId) {

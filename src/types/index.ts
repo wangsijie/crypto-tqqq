@@ -80,7 +80,7 @@ export interface OrderResponse {
 
 export interface TradeLog {
   timestamp: string;
-  ethPrice: number;
+  assetPrice: number;
   accountEquity: number;
   currentPosition: number;
   targetPosition: number;
@@ -96,4 +96,28 @@ export interface RebalanceResult {
   success: boolean;
   tradeLog: TradeLog;
   error?: string;
+}
+
+export interface InstrumentInfo {
+  instId: string;
+  instType: string;
+  instFamily: string;
+  ctVal: string;
+  ctValCcy: string;
+  ctMult: string;
+  ctType: string;
+  settleCcy: string;
+  baseCcy: string;
+  quoteCcy: string;
+  tickSz: string;
+  lotSz: string;
+  minSz: string;
+  maxLmtSz: string;
+  maxMktSz: string;
+  lever: string;
+  state: string;
+  category: string;
+  listTime: string;
+  expTime: string;
+  uly: string;
 }

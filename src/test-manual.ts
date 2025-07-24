@@ -18,15 +18,15 @@ async function testOKXConnection() {
     const equity = await okxClient.getAccountEquity();
     console.log(`Account Equity: ${equity} USDT\n`);
     
-    // Test 2: Get ETH price
-    console.log('💰 Getting ETH price...');
-    const ethPrice = await okxClient.getETHPrice();
-    console.log(`ETH Price: ${ethPrice} USDT\n`);
+    // Test 2: Get asset price
+    console.log(`💰 Getting ${config.trading.symbol} price...`);
+    const assetPrice = await okxClient.getPrice(config.trading.instrument);
+    console.log(`${config.trading.symbol} Price: ${assetPrice} USDT\n`);
     
-    // Test 3: Get current ETH position
-    console.log('📈 Getting ETH position...');
-    const position = await okxClient.getETHPosition();
-    console.log(`Current ETH Position: ${position} ETH\n`);
+    // Test 3: Get current position
+    console.log(`📈 Getting ${config.trading.symbol} position...`);
+    const position = await okxClient.getPosition(config.trading.instrument);
+    console.log(`Current ${config.trading.symbol} Position: ${position} ${config.trading.symbol}\n`);
     
     // Test 4: Get all positions (detailed)
     console.log('📋 Getting all positions...');
@@ -40,12 +40,12 @@ async function testOKXConnection() {
     // Test 5: Calculate target position using strategy
     console.log('🎯 Calculating target position...');
     const strategy = new StrategyService(okxClient);
-    const targetPosition = strategy.calculateTargetPosition(equity, ethPrice);
+    const targetPosition = strategy.calculateTargetPosition(equity, assetPrice);
     const { delta, needsAdjustment, action } = strategy.calculatePositionDelta(position, targetPosition);
     
-    console.log(`Target Position: ${targetPosition} ETH`);
-    console.log(`Current Position: ${position} ETH`);
-    console.log(`Delta: ${delta} ETH`);
+    console.log(`Target Position: ${targetPosition} ${config.trading.symbol}`);
+    console.log(`Current Position: ${position} ${config.trading.symbol}`);
+    console.log(`Delta: ${delta} ${config.trading.symbol}`);
     console.log(`Needs Adjustment: ${needsAdjustment}`);
     console.log(`Action: ${action}\n`);
     
@@ -115,37 +115,37 @@ async function testFullRebalancing() {
     const strategy = new StrategyService(okxClient, logger);
     
     // Get current data
-    const [equity, ethPrice, position] = await Promise.all([
+    const [equity, assetPrice, position] = await Promise.all([
       okxClient.getAccountEquity(),
-      okxClient.getETHPrice(),
-      okxClient.getETHPosition(),
+      okxClient.getPrice(config.trading.instrument),
+      okxClient.getPosition(config.trading.instrument),
     ]);
     
     // Calculate what would happen
-    const targetPosition = strategy.calculateTargetPosition(equity, ethPrice);
+    const targetPosition = strategy.calculateTargetPosition(equity, assetPrice);
     const { delta, needsAdjustment, action } = strategy.calculatePositionDelta(position, targetPosition);
     
     console.log('📊 Current Market Data:');
     console.log(`  Account Equity: ${equity} USDT`);
-    console.log(`  ETH Price: ${ethPrice} USDT`);
-    console.log(`  Current Position: ${position} ETH`);
+    console.log(`  ${config.trading.symbol} Price: ${assetPrice} USDT`);
+    console.log(`  Current Position: ${position} ${config.trading.symbol}`);
     console.log();
     
     console.log('🎯 Rebalancing Analysis:');
-    console.log(`  Target Position: ${targetPosition} ETH`);
-    console.log(`  Delta: ${delta} ETH`);
+    console.log(`  Target Position: ${targetPosition} ${config.trading.symbol}`);
+    console.log(`  Delta: ${delta} ${config.trading.symbol}`);
     console.log(`  Action Required: ${action}`);
     console.log(`  Needs Adjustment: ${needsAdjustment}`);
     
     if (needsAdjustment && action !== 'hold') {
-      console.log(`  📋 Would execute: ${action.toUpperCase()} ${Math.abs(delta)} ETH`);
+      console.log(`  📋 Would execute: ${action.toUpperCase()} ${Math.abs(delta)} ${config.trading.symbol}`);
     } else {
       console.log('  ⏸️ No action needed (within threshold)');
     }
     
     // Log the dry run
     const tradeLog = strategy.createTradeLog(
-      ethPrice,
+      assetPrice,
       equity,
       position,
       targetPosition,

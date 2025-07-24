@@ -10,8 +10,9 @@ dotenv.config();
 export interface AppConfig {
   okx: OKXConfig;
   trading: {
+    symbol: string;
     leverageMultiplier: number;
-    minAdjustmentETH: number;
+    minAdjustmentSize: number;
     instrument: string;
   };
   scheduler: {
@@ -29,6 +30,9 @@ function validateEnvVar(name: string, value: string | undefined): string {
   return value;
 }
 
+// Get trading symbol from env, default to ETH
+const tradingSymbol = process.env.TRADING_SYMBOL || 'ETH';
+
 export const config: AppConfig = {
   okx: {
     apiKey: validateEnvVar('OKX_API_KEY', process.env.OKX_API_KEY),
@@ -36,9 +40,10 @@ export const config: AppConfig = {
     passphrase: validateEnvVar('OKX_PASSPHRASE', process.env.OKX_PASSPHRASE),
   },
   trading: {
+    symbol: tradingSymbol,
     leverageMultiplier: Number(process.env.LEVERAGE_MULTIPLIER) || 3,
-    minAdjustmentETH: Number(process.env.MIN_ADJUSTMENT_ETH) || 0.01,
-    instrument: 'ETH-USDT-SWAP',
+    minAdjustmentSize: Number(process.env.MIN_ADJUSTMENT_SIZE) || 0.01,
+    instrument: `${tradingSymbol}-USDT-SWAP`,
   },
   scheduler: {
     cronSchedule: process.env.CRON_SCHEDULE || '5 0 * * *', // Daily at UTC 00:05

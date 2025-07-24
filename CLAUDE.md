@@ -1,13 +1,13 @@
-# Claude Development Guide - ETH 3x Leverage Strategy
+# Claude Development Guide - Crypto 3x Leverage Strategy
 
 ## Project Overview
-This is an automated ETH perpetual contract rebalancing tool that maintains 3x leverage using OKX API. The system runs daily to adjust positions based on account equity.
+This is an automated cryptocurrency perpetual contract rebalancing tool that maintains 3x leverage using OKX API. The system runs daily to adjust positions based on account equity. The trading instrument is configurable via environment variables.
 
 ## Key Context
-- **Target Formula:** `Target Position (ETH) = Current Equity (USDT) × 3 ÷ Current ETH Price (USDT)`
-- **Trading Pair:** ETHUSDT perpetual contract (long positions only)
+- **Target Formula:** `Target Position = Current Equity (USDT) × 3 ÷ Current Asset Price (USDT)`
+- **Trading Pair:** Configurable via `TRADING_SYMBOL` env var (e.g., ETH, DOGE, BTC)
 - **Rebalancing:** Daily at UTC 00:05
-- **Minimum Adjustment:** 0.01 ETH threshold
+- **Minimum Adjustment:** Configurable via `MIN_ADJUSTMENT_SIZE` env var
 - **API:** OKX exchange API
 
 ## Development Guidelines

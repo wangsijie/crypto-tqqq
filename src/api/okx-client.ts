@@ -4,8 +4,8 @@
  */
 
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
-import crypto from 'crypto';
-import { OKXConfig, AccountBalance, TickerData, Position, OrderRequest, OrderResponse } from '../types';
+import * as crypto from 'crypto';
+import { OKXConfig, AccountBalance, TickerData, Position, OrderRequest, OrderResponse, InstrumentInfo } from '../types';
 
 export class OKXClient {
   private client: AxiosInstance;
@@ -123,24 +123,84 @@ export class OKXClient {
   }
 
   /**
-   * Get current ETH perpetual position size
+   * Get current position size for a specific instrument in base currency amount
+   * For perpetual swaps, this converts contracts to actual base currency amount
    */
-  async getETHPosition(): Promise<number> {
-    const positions = await this.getPositions('ETH-USDT-SWAP');
+  async getPosition(instId: string): Promise<number> {
+    const positions = await this.getPositions(instId);
     
     if (positions.length === 0) {
       return 0;
     }
 
-    const ethPosition = positions.find(p => p.instId === 'ETH-USDT-SWAP' && p.posSide === 'long');
-    return ethPosition ? parseFloat(ethPosition.pos) : 0;
+    const position = positions.find(p => p.instId === instId && p.posSide === 'long');
+    if (!position) {
+      return 0;
+    }
+
+    const contractsHeld = parseFloat(position.pos);
+    
+    // For perpetual swaps, we need to convert contracts to base currency amount
+    if (position.instType === 'SWAP') {
+      try {
+        const instrumentInfo = await this.getInstrument(instId);
+        const contractValue = parseFloat(instrumentInfo.ctVal);
+        
+        // Contract value represents how much of the base currency each contract is worth
+        // For DOGE-USDT-SWAP: ctVal = 1000 means 1 contract = 1000 DOGE
+        return contractsHeld * contractValue;
+      } catch (error) {
+        console.error(`Error fetching instrument info for ${instId}:`, error);
+        // Fallback to raw contract count if we can't get instrument info
+        return contractsHeld;
+      }
+    }
+    
+    // For spot trading, position.pos should already be in base currency
+    return contractsHeld;
   }
 
   /**
-   * Get current ETH/USDT perpetual contract price
+   * Get raw contract count for debugging purposes
+   * Returns the actual number of contracts held (not converted to base currency)
    */
-  async getETHPrice(): Promise<number> {
-    const ticker = await this.getTicker('ETH-USDT-SWAP');
+  async getPositionContracts(instId: string): Promise<number> {
+    const positions = await this.getPositions(instId);
+    
+    if (positions.length === 0) {
+      return 0;
+    }
+
+    const position = positions.find(p => p.instId === instId && p.posSide === 'long');
+    return position ? parseFloat(position.pos) : 0;
+  }
+
+  /**
+   * Get current price for a specific instrument
+   */
+  async getPrice(instId: string): Promise<number> {
+    const ticker = await this.getTicker(instId);
     return parseFloat(ticker.last);
+  }
+
+  /**
+   * Get instrument specifications including contract details
+   * This is a public endpoint that doesn't require authentication
+   */
+  async getInstrument(instId: string, instType: string = 'SWAP'): Promise<InstrumentInfo> {
+    // Use axios directly for public endpoint (no auth required)
+    const response = await axios.get(
+      `https://www.okx.com/api/v5/public/instruments?instType=${instType}&instId=${instId}`
+    );
+    
+    if (response.data.code !== '0') {
+      throw new Error(`OKX API Error: ${response.data.msg}`);
+    }
+
+    if (!response.data.data || response.data.data.length === 0) {
+      throw new Error(`Instrument ${instId} not found`);
+    }
+
+    return response.data.data[0];
   }
 }

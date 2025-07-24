@@ -1,9 +1,9 @@
-# ETH 3x Leverage Strategy - Implementation Roadmap
+# Crypto 3x Leverage Strategy - Implementation Roadmap
 
 ## Project Overview
-Automated daily rebalancing tool for ETH perpetual contracts using OKX API to maintain 3x leverage position.
+Automated daily rebalancing tool for cryptocurrency perpetual contracts using OKX API to maintain 3x leverage position.
 
-**Target Formula:** `Target Position (ETH) = Current Equity (USDT) × 3 ÷ Current ETH Price (USDT)`
+**Target Formula:** `Target Position = Current Equity (USDT) × 3 ÷ Current Asset Price (USDT)`
 
 ## Implementation Tasks
 
@@ -18,9 +18,10 @@ Automated daily rebalancing tool for ETH perpetual contracts using OKX API to ma
 - [ ] Implement main rebalancing logic that orchestrates all steps
 
 ### Medium Priority
-- [x] Create position calculation logic: target = equity × 3 ÷ ETH_price
-- [x] Create delta calculation and decision logic (minimum 0.01 ETH threshold)
-- [ ] Create transaction logging system (time, price, equity, position, adjustment) *(in progress)*
+- [x] Create position calculation logic: target = equity × 3 ÷ asset_price
+- [x] Create delta calculation and decision logic (minimum adjustment threshold)
+- [x] Create transaction logging system (time, price, equity, position, adjustment)
+- [x] Make trading instrument configurable (support any crypto via env vars)
 - [ ] Add error handling and retry mechanisms for API failures
 - [ ] Create daily scheduler (cron job for UTC 00:05)
 
@@ -29,16 +30,16 @@ Automated daily rebalancing tool for ETH perpetual contracts using OKX API to ma
 - [ ] Create documentation and setup instructions
 
 ## Key Requirements
-- **Trading Pair:** ETHUSDT perpetual contract (long positions only)
+- **Trading Pair:** Configurable via `TRADING_SYMBOL` environment variable (e.g., ETH, DOGE, BTC)
 - **Rebalancing Frequency:** Daily at UTC 00:05
-- **Minimum Adjustment:** 0.01 ETH
-- **Leverage Target:** 3x
+- **Minimum Adjustment:** Configurable via `MIN_ADJUSTMENT_SIZE` environment variable
+- **Leverage Target:** 3x (configurable via `LEVERAGE_MULTIPLIER`)
 - **Logging:** All trades with timestamp, price, equity, position, and adjustment amount
 
 ## Example Calculation
-- Current ETH/USDT = 2,100
+- Current Asset Price = 2,100 USDT
 - Current Equity = 12,000 USDT
-- Current Position = 15 ETH
-- Target Position = 12,000 × 3 ÷ 2,100 = 17.14 ETH
-- Delta = 17.14 - 15 = +2.14 ETH
-- **Action:** Market buy 2.14 ETH contracts
+- Current Position = 15 units
+- Target Position = 12,000 × 3 ÷ 2,100 = 17.14 units
+- Delta = 17.14 - 15 = +2.14 units
+- **Action:** Market buy 2.14 contracts

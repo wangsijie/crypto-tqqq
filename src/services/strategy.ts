@@ -18,11 +18,11 @@ export class StrategyService {
   }
 
   /**
-   * Calculate target ETH position based on current equity and leverage multiplier
-   * Formula: Target Position (ETH) = Current Equity (USDT) × 3 ÷ Current ETH Price (USDT)
+   * Calculate target position based on current equity and leverage multiplier
+   * Formula: Target Position = Current Equity (USDT) × Leverage ÷ Asset Price (USDT)
    */
-  calculateTargetPosition(equity: number, ethPrice: number): number {
-    const targetPosition = (equity * config.trading.leverageMultiplier) / ethPrice;
+  calculateTargetPosition(equity: number, assetPrice: number): number {
+    const targetPosition = (equity * config.trading.leverageMultiplier) / assetPrice;
     return Math.round(targetPosition * 10000) / 10000; // Round to 4 decimal places
   }
 
@@ -37,7 +37,7 @@ export class StrategyService {
   } {
     const delta = targetPosition - currentPosition;
     const absDelta = Math.abs(delta);
-    const needsAdjustment = absDelta >= config.trading.minAdjustmentETH;
+    const needsAdjustment = absDelta >= config.trading.minAdjustmentSize;
 
     let action: 'buy' | 'sell' | 'hold';
     if (!needsAdjustment) {
@@ -90,7 +90,7 @@ export class StrategyService {
    * Create trade log entry
    */
   createTradeLog(
-    ethPrice: number,
+    assetPrice: number,
     accountEquity: number,
     currentPosition: number,
     targetPosition: number,
@@ -103,7 +103,7 @@ export class StrategyService {
   ): TradeLog {
     return {
       timestamp: new Date().toISOString(),
-      ethPrice,
+      assetPrice,
       accountEquity,
       currentPosition,
       targetPosition,
@@ -122,14 +122,14 @@ export class StrategyService {
   async executeRebalancing(): Promise<RebalanceResult> {
     try {
       // Step 1: Get current market data
-      const [accountEquity, ethPrice, currentPosition] = await Promise.all([
+      const [accountEquity, assetPrice, currentPosition] = await Promise.all([
         this.okxClient.getAccountEquity(),
-        this.okxClient.getETHPrice(),
-        this.okxClient.getETHPosition(),
+        this.okxClient.getPrice(config.trading.instrument),
+        this.okxClient.getPosition(config.trading.instrument),
       ]);
 
       // Step 2: Calculate target position and delta
-      const targetPosition = this.calculateTargetPosition(accountEquity, ethPrice);
+      const targetPosition = this.calculateTargetPosition(accountEquity, assetPrice);
       const { delta, needsAdjustment, action } = this.calculatePositionDelta(
         currentPosition,
         targetPosition
@@ -147,7 +147,7 @@ export class StrategyService {
 
       // Step 4: Create trade log
       const tradeLog = this.createTradeLog(
-        ethPrice,
+        assetPrice,
         accountEquity,
         currentPosition,
         targetPosition,
