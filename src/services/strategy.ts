@@ -6,15 +6,18 @@
 import { OKXClient } from '../api';
 import { TradeLog, RebalanceResult } from '../types';
 import { LoggerService } from './logger';
+import { TelegramService } from './telegram';
 import config from '../config';
 
 export class StrategyService {
   private okxClient: OKXClient;
   private logger: LoggerService;
+  private telegram: TelegramService;
 
-  constructor(okxClient: OKXClient, logger?: LoggerService) {
+  constructor(okxClient: OKXClient, logger?: LoggerService, telegram?: TelegramService) {
     this.okxClient = okxClient;
     this.logger = logger || new LoggerService();
+    this.telegram = telegram || new TelegramService();
   }
 
   /**
@@ -173,6 +176,11 @@ export class StrategyService {
 
       // Step 5: Log the trade
       await this.logger.logTrade(tradeLog);
+
+      // Step 6: Send Telegram notification for dry-run mode
+      if (config.trading.dryRun) {
+        await this.telegram.sendDryRunNotification(tradeLog);
+      }
 
       return {
         success: orderResult.success,

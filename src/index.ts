@@ -4,7 +4,7 @@
  */
 
 import { OKXClient } from './api';
-import { StrategyService, LoggerService } from './services';
+import { StrategyService, LoggerService, TelegramService } from './services';
 import config from './config';
 
 async function main() {
@@ -12,13 +12,15 @@ async function main() {
   console.log(`📊 Target: ${config.trading.leverageMultiplier}x leverage on ${config.trading.instrument}`);
   console.log(`⚡ Min adjustment: ${config.trading.minAdjustmentSize} ${config.trading.symbol}`);
   console.log(`🧪 Mode: ${config.trading.dryRun ? 'DRY RUN (Safe)' : 'LIVE TRADING'}`);
+  console.log(`📱 Telegram: ${config.telegram.enabled ? 'Enabled' : 'Disabled'}`);
   console.log('─'.repeat(60));
 
   try {
     // Initialize services
     const okxClient = new OKXClient(config.okx);
     const logger = new LoggerService();
-    const strategy = new StrategyService(okxClient, logger);
+    const telegram = new TelegramService();
+    const strategy = new StrategyService(okxClient, logger, telegram);
 
     // Execute rebalancing
     console.log('🔄 Starting rebalancing process...');

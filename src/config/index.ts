@@ -22,6 +22,11 @@ export interface AppConfig {
   logging: {
     level: string;
   };
+  telegram: {
+    enabled: boolean;
+    botToken?: string;
+    chatId?: string;
+  };
 }
 
 function validateEnvVar(name: string, value: string | undefined): string {
@@ -52,6 +57,11 @@ export const config: AppConfig = {
   },
   logging: {
     level: process.env.LOG_LEVEL || 'info',
+  },
+  telegram: {
+    enabled: process.env.TELEGRAM_ENABLED === 'true',
+    botToken: process.env.TELEGRAM_BOT_TOKEN,
+    chatId: process.env.TELEGRAM_CHAT_ID,
   },
 };
 
