@@ -1,5 +1,4 @@
 node_modules
-src
 .git
 .env*
 .DS_Store
@@ -8,5 +7,5 @@ logs
 README.md
 .eslintrc*
 jest.config*
-tsconfig.json
 *.md
+dist
